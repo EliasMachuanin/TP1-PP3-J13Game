@@ -1,0 +1,14 @@
+*{
+    padding: 0px;
+    margin: 0px;
+    font-family: sans-serif;
+}
+
+.content{
+    padding: 0px;
+    margin: auto;
+    width: 600px;
+    width: 600px;
+    background-color: #ffb;
+    border:10px dashed #aa4;
+}
