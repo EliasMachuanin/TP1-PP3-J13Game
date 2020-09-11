@@ -1,14 +1,37 @@
-*{
+* {
     padding: 0px;
     margin: 0px;
     font-family: sans-serif;
 }
 
-.content{
+.content {
     padding: 0px;
     margin: auto;
-    width: 600px;
-    width: 600px;
+    width: 500px;
+    height: 500px;
     background-color: #ffb;
-    border:10px dashed #aa4;
+    border: 10px dashed #aa4;
+}
+
+#player {
+    background-color: #900;
+    border: 4px dashed #b22;
+    width: 50px;
+    height: 50px;
+    border-radius: 29px;
+    position:absolute;
+}
+
+.pointer {
+    background-color: #ccc;
+    height: 50px;
+    margin-top: 30px;
+    border-bottom: 0px;
+    padding-top: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.level{
+    color: blue;
 }
