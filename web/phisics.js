@@ -497,6 +497,7 @@ var Rectangle = (center, width, height, mass, friction, restitution, name) => Ri
 // DEMO
 // ====
 
+//creamos los objetos
 r1 = Rectangle(Vec2(500, 100), 700, 20, 0, 1, .5, "ROOF");
 
 r2 = Rectangle(Vec2(500, 500), 700, 20, 0, 1, .5, "FLOOR");
