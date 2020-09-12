@@ -1,6 +1,7 @@
 c = a.getContext('2d');
 
 
+
 // MINI 2D PHYSICS
 // ===============
 
@@ -61,7 +62,7 @@ var RigidShape = (C, mass, F, R, T, B, W, H, shape, name ="") => {
       Vec2(C.x + W / 2, C.y + H / 2),
       Vec2(C.x - W / 2, C.y + H / 2)
     ],
-    Name: name
+    Name: name,
   };
 
   // Prepare rectangle
@@ -235,6 +236,16 @@ var testCollision = (c1, c2, info) => {
         }
       }
     }
+    var statusfinal = status1 && status2;
+    console.log(statusfinal);
+    // if (statusfinal){
+    //   if (c1.Name == "ENEMY" ){
+    //     c1.V.x = 1000000;
+    //   }else if (c2.Name == "ENEMY"){
+    //     c2.V.x = 1000000;
+    //   }
+      
+    // }
     return status1 && status2;
   }
 
@@ -412,9 +423,146 @@ var resolveCollision = (s1, s2, collisionInfo) => {
   s2.v += R2crossT * jT * s2.I;
 };
 
+// New circle
+var Circle = (center, radius, mass, friction, restitution) => RigidShape(center, mass, friction, restitution, 0, radius, null, null, null, name);
+
+// New rectangle
+var Rectangle = (center, width, height, mass, friction, restitution, name) => RigidShape(center, mass, friction, restitution, 1, Math.hypot(width, height) / 2, width, height, null, name);
+
+// DEMO
+// ====
+
+//creamos los objetos
+r1 = Rectangle(Vec2(500, 100), 650, 20, 0, 1, .5, "ROOF");
+
+r2 = Rectangle(Vec2(500, 500), 650, 20, 0, 1, .5, "FLOOR");
+
+r3 = Rectangle(Vec2(150, 240), 15, 500, 0, 1, .5, "LEFT");
+
+r4 = Rectangle(Vec2(850, 240), 15, 500, 0, 1, .5, "RIGHT");
+// r = Rectangle(Vec2(500, 200), 500, 20, 0, 1, .5);
+// rotateShape(r1, .5);
+// rotateShape(r2, 1.5);
+// rotateShape(r3, 1.5);
+// rotateShape(r4, 1.5);
+// Rectangle(Vec2(200, 400), 400, 20, 0, 1, .5);
+// // Rectangle(Vec2(100, 200), 200, 20, 0, 1, .5);
+// Rectangle(Vec2(10, 360), 20, 100, 0, 1, .5);
+
+
+r = Circle(Vec2(200, 150), 30, 0.5, 1, .5, "PLAYER");
+
+let timer = 3000;
+let obs = Rectangle(Vec2(getRandomArbitrary(180, 830), 150),10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
+
+//meta
+//puerta = Rectangle(Vec2(800, 450), 50, 80, 0, 1, .5, "DOOR");
+//console.log(puerta.Name);
+
+setTimeout(function () {
+  generateEnemy(3000);
+}, 1000);
+
+
+function generateEnemy(timerEnemy) {
+  setTimeout(function () {
+    rand = getRandomArbitrary(180, 830);
+    obs = Rectangle(Vec2(rand, 150),10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
+    if (timerEnemy > 500) {
+      timerEnemy = timerEnemy - 500;
+    }
+    
+    console.log(obs.Name);
+
+    generateEnemy(timerEnemy);
+    
+  }, timerEnemy);
+  
+}
+
+// function randomIntFromInterval(min, max) { // min and max included 
+//   return Math.floor(Math.random() * (max - min + 1) + min);
+// }
+
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
+}
+// for(var i = 0; i < 30; i++){
+//   // obs = Circle(Vec2(Math.random() * 800, Math.random() * 450 / 2), Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2);
+//   // rotateShape(obs, Math.random() * 7);
+//   obs = Rectangle(Vec2(Math.random() * 800, Math.random() * 450 / 2), Math.random() * 20 + 10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2);
+//   rotateShape(obs, Math.random() * 7);
+// }
+
+var Keys = {
+  up: false,
+  down: false,
+  left: false,
+  right: false,
+};
+
+window.onkeydown = function (e) {
+  var kc = e.keyCode;
+  e.preventDefault();
+
+  if (kc === 65) Keys.left = true;  // only one key per event
+  else if (kc === 87) Keys.up = true;    // so check exclusively
+  else if (kc === 68) Keys.right = true;
+  else if (kc === 83) Keys.down = true;
+  verifMove();
+};
+
+window.onkeyup = function (e) {
+  var kc = e.keyCode;
+  e.preventDefault();
+
+  if (kc === 65) Keys.left = false;
+  else if (kc === 87) Keys.up = false;
+  else if (kc === 68) Keys.right = false;
+  else if (kc === 83) Keys.down = false;
+};
+
+
+function verifMove() {
+  if (Keys.up) {
+    movePlayer("up");
+  }
+  else if (Keys.down) {  // both up and down does not work so check excl.
+    movePlayer("down");
+  }
+  if (Keys.left) {
+    movePlayer("left");
+  }
+  else if (Keys.right) {
+    movePlayer("right");
+  }
+}
+
+function movePlayer(move) {
+  // var positionActual = getPosition(player);
+  // console.log(positionActual);
+  r.I = 0.0001;
+  if (move == "left") {
+    moveShape(r, Vec2(-8, 0), 1);
+  }
+  if (move == "right") {
+
+    moveShape(r, Vec2(8, 0), 1);
+  }
+  if (move == "up") {
+    moveShape(r, Vec2(0, -5), 1);
+  }
+  if (move == "down") {
+    moveShape(r, Vec2(0, 0), 1);
+  }
+}
+
+
 // Loop
 setInterval(
+  
   (i, j, k) => {
+    
 
     // Reset
     a.width ^= 0;
@@ -423,6 +571,7 @@ setInterval(
     for (k = 9; k--;) {
       for (i = objects.length; i--;) {
         for (j = objects.length; j-- > i;) {
+          
 
           // Test bounds
           if (boundTest(objects[i], objects[j])) {
@@ -483,156 +632,22 @@ setInterval(
       moveShape(objects[i], scale(objects[i].V, 1 / 60));
       objects[i].v += objects[i].a * 1 / 60;
       rotateShape(objects[i], objects[i].v * 1 / 60);
+      
     }
+    // if(testCollision(r, r2, collisionInfo)){
+    //   console.log("EL PLAYER TOCO EL SUELO");
+    // }
+    if(testCollision(obs, r, collisionInfo)){
+      console.log("PERDISTE");
+    }
+    /*if(testCollision(obs, r2, collisionInfo)){
+        console.log("un enemigo choco contra el piso");
+    }*/
+    
   },
-  16
+  16,
 );
 
-// New circle
-var Circle = (center, radius, mass, friction, restitution) => RigidShape(center, mass, friction, restitution, 0, radius, null, null, null, name);
-
-// New rectangle
-var Rectangle = (center, width, height, mass, friction, restitution, name) => RigidShape(center, mass, friction, restitution, 1, Math.hypot(width, height) / 2, width, height, null, name);
-
-// DEMO
-// ====
-
-//creamos los objetos
-r1 = Rectangle(Vec2(500, 100), 700, 20, 0, 1, .5, "ROOF");
-
-r2 = Rectangle(Vec2(500, 500), 700, 20, 0, 1, .5, "FLOOR");
-
-r3 = Rectangle(Vec2(150, 300), 20, 500, 0, 1, .5, "LEFT");
-
-r4 = Rectangle(Vec2(850, 300), 20, 500, 0, 1, .5, "RIGHT");
-// r = Rectangle(Vec2(500, 200), 500, 20, 0, 1, .5);
-// rotateShape(r1, .5);
-// rotateShape(r2, 1.5);
-// rotateShape(r3, 1.5);
-// rotateShape(r4, 1.5);
-// Rectangle(Vec2(200, 400), 400, 20, 0, 1, .5);
-// // Rectangle(Vec2(100, 200), 200, 20, 0, 1, .5);
-// Rectangle(Vec2(10, 360), 20, 100, 0, 1, .5);
-r = Circle(Vec2(200, 150), 30, 0.5, 1, .5, "PLAYER");
-
-let timer = 3000;
-//meta
-puerta = Rectangle(Vec2(800, 450), 50, 80, 0, 1, .5, "DOOR");
-console.log(puerta.Name);
-
-setTimeout(function () {
-  generateEnemy(3000);
-}, 1000);
 
 
-function generateEnemy(timerEnemy) {
-  setTimeout(function () {
-    let rand = getRandomArbitrary(180, 830);
-    let obs = Rectangle(Vec2(rand, 150),10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
-    if (timerEnemy > 500) {
-      timerEnemy = timerEnemy - 500;
-    }
-    
-    console.log(obs.Name);
-    
-
-    generateEnemy(timerEnemy);
-  }, timerEnemy);
-}
-
-
-// function randomIntFromInterval(min, max) { // min and max included 
-//   return Math.floor(Math.random() * (max - min + 1) + min);
-// }
-
-function getRandomArbitrary(min, max) {
-  return Math.random() * (max - min) + min;
-}
-// for(var i = 0; i < 30; i++){
-//   // obs = Circle(Vec2(Math.random() * 800, Math.random() * 450 / 2), Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2);
-//   // rotateShape(obs, Math.random() * 7);
-//   obs = Rectangle(Vec2(Math.random() * 800, Math.random() * 450 / 2), Math.random() * 20 + 10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2);
-//   rotateShape(obs, Math.random() * 7);
-// }
-
-var Keys = {
-  up: false,
-  down: false,
-  left: false,
-  right: false
-};
-
-
-
-window.onkeydown = function (e) {
-  var kc = e.keyCode;
-  e.preventDefault();
-
-  if (kc === 37) Keys.left = true;  // only one key per event
-  else if (kc === 38) Keys.up = true;    // so check exclusively
-  else if (kc === 39) Keys.right = true;
-  else if (kc === 40) Keys.down = true;
-  verifMove();
-};
-
-window.onkeyup = function (e) {
-  var kc = e.keyCode;
-  e.preventDefault();
-
-  if (kc === 37) Keys.left = false;
-  else if (kc === 38) Keys.up = false;
-  else if (kc === 39) Keys.right = false;
-  else if (kc === 40) Keys.down = false;
-};
-
-
-function verifMove() {
-  if (Keys.up) {
-    movePlayer("up");
-  }
-  else if (Keys.down) {  // both up and down does not work so check excl.
-    movePlayer("down");
-  }
-
-  if (Keys.left) {
-    movePlayer("left");
-  }
-  else if (Keys.right) {
-    movePlayer("right");
-  }
-}
-
-
-
-function movePlayer(move) {
-
-  // var positionActual = getPosition(player);
-  // console.log(positionActual);
-  if (move == "left") {
-    moveShape(r, Vec2(-5, 0), 1);
-  }
-
-  if (move == "right") {
-    moveShape(r, Vec2(5, 0), 1);
-  }
-
-  if (move == "up") {
-    moveShape(r, Vec2(0, -10), 1);
-  }
-
-  if (move == "down") {
-    moveShape(r, Vec2(0, 0), 1);
-  }
-
-  verifyCollision();
-
-}
-
-function verifyCollision() {
-  if (r.V.x >= puerta.V.x) {
-    console.log("chocaron");
-  }
-  console.log(r.V.x);
-
-}
 
