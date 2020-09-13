@@ -22,7 +22,7 @@ var mGravity = Vec2(0, 1000);
 
 // All shapes
 var objects = [];
-
+var gameplay = true; //change to false when loose
 // Collision info 
 var collisionInfo = {}; // final collision between two shapes
 var collisionInfoR1 = {}; // temp collision: rect 1 vs rect 2
@@ -37,7 +37,7 @@ var setInfo = (collision, D, N, S) => {
 };
 
 // New shape
-var RigidShape = (C, mass, F, R, T, B, W, H, shape, name ="") => {
+var RigidShape = (C, mass, F, R, T, B, W, H, shape, name = "") => {
   shape = {
     T, // 0 circle / 1 rectangle
     C, // center
@@ -225,7 +225,7 @@ var testCollision = (c1, c2, info) => {
     if (status1) {
       status2 = findAxisLeastPenetration(c2, c1, collisionInfoR2);
       if (status2) {
-        
+
         // if both of rectangles are overlapping, choose the shorter normal as the normal     
         if (collisionInfoR1.D < collisionInfoR2.D) {
           setInfo(collisionInfo, collisionInfoR1.D, collisionInfoR1.N, substract(collisionInfoR1.S, scale(collisionInfoR1.N, collisionInfoR1.D)));
@@ -236,16 +236,6 @@ var testCollision = (c1, c2, info) => {
         }
       }
     }
-    var statusfinal = status1 && status2;
-    console.log(statusfinal);
-    // if (statusfinal){
-    //   if (c1.Name == "ENEMY" ){
-    //     c1.V.x = 1000000;
-    //   }else if (c2.Name == "ENEMY"){
-    //     c2.V.x = 1000000;
-    //   }
-      
-    // }
     return status1 && status2;
   }
 
@@ -424,7 +414,7 @@ var resolveCollision = (s1, s2, collisionInfo) => {
 };
 
 // New circle
-var Circle = (center, radius, mass, friction, restitution) => RigidShape(center, mass, friction, restitution, 0, radius, null, null, null, name);
+var Circle = (center, radius, mass, friction, restitution, name) => RigidShape(center, mass, friction, restitution, 0, radius, null, null, null, name);
 
 // New rectangle
 var Rectangle = (center, width, height, mass, friction, restitution, name) => RigidShape(center, mass, friction, restitution, 1, Math.hypot(width, height) / 2, width, height, null, name);
@@ -452,8 +442,9 @@ r4 = Rectangle(Vec2(850, 240), 15, 500, 0, 1, .5, "RIGHT");
 
 r = Circle(Vec2(200, 150), 30, 0.5, 1, .5, "PLAYER");
 
+
 let timer = 3000;
-let obs = Rectangle(Vec2(getRandomArbitrary(180, 830), 150),10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
+let obs = Rectangle(Vec2(getRandomArbitrary(180, 830), 150), 10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
 
 //meta
 //puerta = Rectangle(Vec2(800, 450), 50, 80, 0, 1, .5, "DOOR");
@@ -467,17 +458,17 @@ setTimeout(function () {
 function generateEnemy(timerEnemy) {
   setTimeout(function () {
     rand = getRandomArbitrary(180, 830);
-    obs = Rectangle(Vec2(rand, 150),10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
+    obs = Rectangle(Vec2(rand, 150), 10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
     if (timerEnemy > 500) {
       timerEnemy = timerEnemy - 500;
     }
-    
+
     console.log(obs.Name);
 
     generateEnemy(timerEnemy);
-    
+
   }, timerEnemy);
-  
+
 }
 
 // function randomIntFromInterval(min, max) { // min and max included 
@@ -541,7 +532,7 @@ function verifMove() {
 function movePlayer(move) {
   // var positionActual = getPosition(player);
   // console.log(positionActual);
-  r.I = 0.0001;
+  // r.I = 0.0001;
   if (move == "left") {
     moveShape(r, Vec2(-8, 0), 1);
   }
@@ -557,95 +548,103 @@ function movePlayer(move) {
   }
 }
 
+function looser() {
+  alert("You loose bro...");
+  //TODO: guardar time maximo en localstorage
+  window.location.reload();
+}
 
 // Loop
 setInterval(
-  
+
   (i, j, k) => {
-    
+    if (gameplay) {
+      // Reset
+      a.width ^= 0;
+      // Compute collisions
+      for (k = 9; k--;) {
+        for (i = objects.length; i--;) {
+          for (j = objects.length; j-- > i;) {
 
-    // Reset
-    a.width ^= 0;
 
-    // Compute collisions
-    for (k = 9; k--;) {
-      for (i = objects.length; i--;) {
-        for (j = objects.length; j-- > i;) {
-          
+            // Test bounds
+            if (boundTest(objects[i], objects[j])) {
 
-          // Test bounds
-          if (boundTest(objects[i], objects[j])) {
+              // Test collision
+              if (testCollision(objects[i], objects[j], collisionInfo)) {
+                // Make sure the normal is always from object[i] to object[j]
+                if (dot(collisionInfo.N, substract(objects[j].C, objects[i].C)) < 0) {
+                  collisionInfo = {
+                    D: collisionInfo.D,
+                    N: scale(collisionInfo.N, -1),
+                    S: collisionInfo.E,
+                    E: collisionInfo.S
+                  };
+                }
 
-            // Test collision
-            if (testCollision(objects[i], objects[j], collisionInfo)) {
-                // if(objects[i].Name == "ENEMY" && objects[j].Name == "FLOOR"){
-                //   console.log("un enemigo choco contra el piso");
-                // }else if(objects[i].Name == "ENEMY"){
-                //   console.log(objects[j].Name);
-                // }
-              // Make sure the normal is always from object[i] to object[j]
-              if (dot(collisionInfo.N, substract(objects[j].C, objects[i].C)) < 0) {
-                collisionInfo = {
-                  D: collisionInfo.D,
-                  N: scale(collisionInfo.N, -1),
-                  S: collisionInfo.E,
-                  E: collisionInfo.S
-                };
+                // Resolve collision
+                resolveCollision(objects[i], objects[j], collisionInfo);
+
+                //VERIFY IF ENEMY CRASH WITH FLOOR
+                if (objects[i].Name == "ENEMY" && objects[j].Name == "FLOOR") {
+                  objects[i].V.x = 1000000;
+                } else if (objects[j].Name == "ENEMY" && objects[i].Name == "FLOOR") {
+                  objects[j].V.x = 1000000;
+                }
+
+                //VERIFY IF ENEMY CRASH WITH BALL
+                if (objects[i].Name == "ENEMY" && objects[j].Name == "PLAYER") {
+                  gameplay = false;
+                  looser();
+                  return;
+                } else if (objects[j].Name == "ENEMY" && objects[i].Name == "PLAYER") {
+                  gameplay = false;
+                  looser();
+                  return;
+                }
               }
-
-              // Resolve collision
-              resolveCollision(objects[i], objects[j], collisionInfo);
             }
           }
         }
       }
-    }
 
-    // Draw / Update scene
-    for (i = objects.length; i--;) {
 
-      // Draw
-      // ----
+      // Draw / Update scene
+      for (i = objects.length; i--;) {
 
-      c.save();
-      c.translate(objects[i].C.x, objects[i].C.y);
-      c.rotate(objects[i].G);
+        // Draw
+        // ----
 
-      // Circle
-      if (!objects[i].T) {
-        c.beginPath();
-        c.arc(0, 0, objects[i].B, 0, 7);
-        c.lineTo(0, 0);
-        c.closePath();
-        c.stroke();
+        c.save();
+        c.translate(objects[i].C.x, objects[i].C.y);
+        c.rotate(objects[i].G);
+
+        // Circle
+        if (!objects[i].T) {
+          c.beginPath();
+          c.arc(0, 0, objects[i].B, 0, 7);
+          c.lineTo(0, 0);
+          c.closePath();
+          c.stroke();
+        }
+
+        // Rectangle
+        else {//if(objects[i].T == 1){
+          c.strokeRect(-objects[i].W / 2, -objects[i].H / 2, objects[i].W, objects[i].H);
+        }
+
+        c.restore();
+
+        // Update position/rotation
+        objects[i].V = add(objects[i].V, scale(objects[i].A, 1 / 60));
+        moveShape(objects[i], scale(objects[i].V, 1 / 60));
+        objects[i].v += objects[i].a * 1 / 60;
+        rotateShape(objects[i], objects[i].v * 1 / 60);
+
       }
-
-      // Rectangle
-      else {//if(objects[i].T == 1){
-        c.strokeRect(-objects[i].W / 2, -objects[i].H / 2, objects[i].W, objects[i].H);
-      }
-
-      c.restore();
-
-      // Update position/rotation
-      objects[i].V = add(objects[i].V, scale(objects[i].A, 1 / 60));
-      moveShape(objects[i], scale(objects[i].V, 1 / 60));
-      objects[i].v += objects[i].a * 1 / 60;
-      rotateShape(objects[i], objects[i].v * 1 / 60);
-      
     }
-    // if(testCollision(r, r2, collisionInfo)){
-    //   console.log("EL PLAYER TOCO EL SUELO");
-    // }
-    if(testCollision(obs, r, collisionInfo)){
-      console.log("PERDISTE");
-    }
-    /*if(testCollision(obs, r2, collisionInfo)){
-        console.log("un enemigo choco contra el piso");
-    }*/
-    
   },
-  16,
+  18,
 );
 
 
