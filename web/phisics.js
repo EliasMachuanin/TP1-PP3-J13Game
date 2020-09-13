@@ -428,11 +428,11 @@ var Rectangle = (center, width, height, mass, friction, restitution, name) => Ri
 // ====
 
 //creamos los objetos
-var r1 = Rectangle(Vec2(500, positionYRoof), 650, 20, 0, 1, .5, "ROOF");
+var r1 = Rectangle(Vec2(500, positionYRoof), 675, 20, 0, 1, .5, "ROOF");
 
-var r2 = Rectangle(Vec2(300, 500), 300, 20, 0, 1, .5, "FLOOR");
+var r2 = Rectangle(Vec2(293, 500), 300, 20, 0, 1, .5, "FLOOR");
 
-var r2 = Rectangle(Vec2(700, 500), 300, 20, 0, 1, .5, "FLOOR");
+var r2 = Rectangle(Vec2(707, 500), 300, 20, 0, 1, .5, "FLOOR");
 
 var r3 = Rectangle(Vec2(150, 240), 15, 500, 0, 1, .5, "LEFT");
 
