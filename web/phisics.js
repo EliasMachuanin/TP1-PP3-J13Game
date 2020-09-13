@@ -23,6 +23,10 @@ var mGravity = Vec2(0, 1000);
 // All shapes
 var objects = [];
 var gameplay = true; //change to false when loose
+var tiempoSegundos = 0;
+var yourScore = 0; 
+var topScore = localStorage.getItem("topScore") == null ? 0 : localStorage.getItem("topScore");
+document.getElementById("topScore").innerHTML = topScore;
 var positionYRoof = 25;
 // Collision info 
 var collisionInfo = {}; // final collision between two shapes
@@ -443,7 +447,7 @@ var r4 = Rectangle(Vec2(850, 240), 15, 500, 0, 1, .5, "RIGHT");
 // Rectangle(Vec2(10, 360), 20, 100, 0, 1, .5);
 
 
-r = Circle(Vec2(200, 450), 30, 0.5, 1, .5, "PLAYER");
+r = Circle(Vec2(200, 450), 25, 0.5, 1, .5, "PLAYER");
 
 
 let timer = 3000;
@@ -454,8 +458,8 @@ var obs = Rectangle(Vec2(getRandomArbitrary(180, 830), positionYRoof + 20), 10, 
 //console.log(puerta.Name);
 
 setTimeout(function () {
-  generateEnemy(3000);
-}, 1000);
+  generateEnemy(1000);
+}, 3000);
 
 var positionY = 50;
 function generateEnemy(timerEnemy) {
@@ -464,20 +468,18 @@ function generateEnemy(timerEnemy) {
     console.log(positionY);
     rand = getRandomArbitrary(180, 830);
     obs = Rectangle(Vec2(rand, positionY), 10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
-    if (timerEnemy > 500) {
-
-      timerEnemy = timerEnemy - 500;
+    obs.v = Math.random() * 20 + 10;
+    if (timerEnemy > 100) {
+      timerEnemy = timerEnemy - 100;
     } else {
-      if (positionYRoof < 60) {
+      if (positionYRoof < 210) {
         console.log(positionYRoof);
-        positionY += 5;
+        positionY += 1;
         positionYRoof += 1;
         r1.V.y = 10;
       } else {
         r1.V.y = 0;
       }
-
-
     }
 
     console.log(obs.Name);
@@ -551,44 +553,53 @@ function movePlayer(move) {
   // console.log(positionActual);
   // r.I = 0.0001;
   if (move == "left") {
-    r.V.x = -400;
+    r.V.x = -300;
   }
   if (move == "right") {
-    r.V.x = 400;
+    r.V.x = 300;
   }
   if (move == "up") {
-    r.V.y = -400;
+    r.V.y = -200;
   }
   if (move == "down") {
-    r.V.y = 400;
+    r.V.y = 0;
   }
 }
 
 function looser() {
+  localStorage.setItem("topScore", topScore);
   alert("You loose bro...");
   //TODO: guardar time maximo en localstorage
   window.location.reload();
 }
 
 function testHole(objectShape) {
-  if (objectShape.C.y > 1000) {
+  if (objectShape.C.y > 600 || (objectShape.C.x < 50 || objectShape.C.x > 925)) {
     gameplay = false;
     looser();
     return true;
   }
+  
 }
-var tiempoSegundos = 0;
 
 setInterval(function () {
   tiempoSegundos++;
   countTime();
 }, 1000);
 
+
+
 function countTime() {
   var minutos = Math.trunc(tiempoSegundos / 60);
   var segundos = tiempoSegundos % 60;
   var minSegDisponibles = minutos.toString().padStart(2, "0") + ":" + segundos.toString().padStart(2, "0");
-  console.log(minSegDisponibles);
+  yourScore = tiempoSegundos;
+  document.getElementById("time").innerHTML = minSegDisponibles;
+  document.getElementById("yourScore").innerHTML = yourScore;
+  if(yourScore > topScore){
+    topScore = yourScore;
+  }
+  document.getElementById("topScore").innerHTML = topScore;
 }
 
 // Loop
@@ -692,7 +703,7 @@ setInterval(
       }
     }
   },
-  18,
+  16,
 );
 
 
