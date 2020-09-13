@@ -443,7 +443,7 @@ var r4 = Rectangle(Vec2(850, 240), 15, 500, 0, 1, .5, "RIGHT");
 // Rectangle(Vec2(10, 360), 20, 100, 0, 1, .5);
 
 
-// r = Circle(Vec2(200, 450), 30, 0.5, 1, .5, "PLAYER");
+r = Circle(Vec2(200, 450), 30, 0.5, 1, .5, "PLAYER");
 
 
 let timer = 3000;
@@ -473,11 +473,11 @@ function generateEnemy(timerEnemy) {
         positionY += 5;
         positionYRoof += 1;
         r1.V.y = 10;
-      }else{
+      } else {
         r1.V.y = 0;
       }
 
-      
+
     }
 
     console.log(obs.Name);
@@ -551,17 +551,16 @@ function movePlayer(move) {
   // console.log(positionActual);
   // r.I = 0.0001;
   if (move == "left") {
-    moveShape(r, Vec2(-8, 0), 1);
+    r.V.x = -400;
   }
   if (move == "right") {
-
-    moveShape(r, Vec2(8, 0), 1);
+    r.V.x = 400;
   }
   if (move == "up") {
-    moveShape(r, Vec2(0, -5), 1);
+    r.V.y = -400;
   }
   if (move == "down") {
-    moveShape(r, Vec2(0, 0), 1);
+    r.V.y = 400;
   }
 }
 
@@ -572,11 +571,24 @@ function looser() {
 }
 
 function testHole(objectShape) {
-  if (objectShape.V.y > 1000) {
+  if (objectShape.C.y > 1000) {
     gameplay = false;
     looser();
     return true;
   }
+}
+var tiempoSegundos = 0;
+
+setInterval(function () {
+  tiempoSegundos++;
+  countTime();
+}, 1000);
+
+function countTime() {
+  var minutos = Math.trunc(tiempoSegundos / 60);
+  var segundos = tiempoSegundos % 60;
+  var minSegDisponibles = minutos.toString().padStart(2, "0") + ":" + segundos.toString().padStart(2, "0");
+  console.log(minSegDisponibles);
 }
 
 // Loop
@@ -594,7 +606,7 @@ setInterval(
 
             // Test bounds
             if (boundTest(objects[i], objects[j])) {
-
+              // VERIFY HOLE
               if (objects[i].Name == "PLAYER") {
                 if (testHole(objects[i])) {
                   return;
