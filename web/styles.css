@@ -13,25 +13,24 @@
     border: 10px dashed #aa4;
 }
 
-#player {
-    background-color: #900;
-    border: 4px dashed #b22;
-    width: 50px;
-    height: 50px;
-    border-radius: 29px;
-    position:absolute;
-}
-
-.pointer {
-    background-color: #ccc;
-    height: 50px;
-    margin-top: 30px;
-    border-bottom: 0px;
-    padding-top: 10px;
+.center{
     text-align: center;
-    font-weight: bold;
 }
 
-.level{
+.right{
+    float: right;
+}
+
+.column-right{
+    position: absolute;
+    right: 150px;
+    top: 50px;
+}
+#timer{
     color: blue;
+}
+
+#easter{
+    font-size: 10px;
+    text-align: center;
 }

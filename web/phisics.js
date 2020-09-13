@@ -452,13 +452,13 @@ r = Circle(Vec2(200, 450), 25, 0.5, 1, .5, "PLAYER");
 
 let timer = 3000;
 var obs = Rectangle(Vec2(getRandomArbitrary(180, 830), positionYRoof + 20), 10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
-
+obs.v = Math.random() * 20 + 10;
 //meta
 //puerta = Rectangle(Vec2(800, 450), 50, 80, 0, 1, .5, "DOOR");
 //console.log(puerta.Name);
 
 setTimeout(function () {
-  generateEnemy(1000);
+  generateEnemy(1500);
 }, 3000);
 
 var positionY = 50;
