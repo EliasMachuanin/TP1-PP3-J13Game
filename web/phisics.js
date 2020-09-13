@@ -23,6 +23,7 @@ var mGravity = Vec2(0, 1000);
 // All shapes
 var objects = [];
 var gameplay = true; //change to false when loose
+var positionYRoof = 25;
 // Collision info 
 var collisionInfo = {}; // final collision between two shapes
 var collisionInfoR1 = {}; // temp collision: rect 1 vs rect 2
@@ -423,13 +424,15 @@ var Rectangle = (center, width, height, mass, friction, restitution, name) => Ri
 // ====
 
 //creamos los objetos
-r1 = Rectangle(Vec2(500, 100), 650, 20, 0, 1, .5, "ROOF");
+var r1 = Rectangle(Vec2(500, positionYRoof), 650, 20, 0, 1, .5, "ROOF");
 
-r2 = Rectangle(Vec2(500, 500), 650, 20, 0, 1, .5, "FLOOR");
+var r2 = Rectangle(Vec2(300, 500), 300, 20, 0, 1, .5, "FLOOR");
 
-r3 = Rectangle(Vec2(150, 240), 15, 500, 0, 1, .5, "LEFT");
+var r2 = Rectangle(Vec2(700, 500), 300, 20, 0, 1, .5, "FLOOR");
 
-r4 = Rectangle(Vec2(850, 240), 15, 500, 0, 1, .5, "RIGHT");
+var r3 = Rectangle(Vec2(150, 240), 15, 500, 0, 1, .5, "LEFT");
+
+var r4 = Rectangle(Vec2(850, 240), 15, 500, 0, 1, .5, "RIGHT");
 // r = Rectangle(Vec2(500, 200), 500, 20, 0, 1, .5);
 // rotateShape(r1, .5);
 // rotateShape(r2, 1.5);
@@ -440,11 +443,11 @@ r4 = Rectangle(Vec2(850, 240), 15, 500, 0, 1, .5, "RIGHT");
 // Rectangle(Vec2(10, 360), 20, 100, 0, 1, .5);
 
 
-r = Circle(Vec2(200, 150), 30, 0.5, 1, .5, "PLAYER");
+// r = Circle(Vec2(200, 450), 30, 0.5, 1, .5, "PLAYER");
 
 
 let timer = 3000;
-let obs = Rectangle(Vec2(getRandomArbitrary(180, 830), 150), 10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
+var obs = Rectangle(Vec2(getRandomArbitrary(180, 830), positionYRoof + 20), 10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
 
 //meta
 //puerta = Rectangle(Vec2(800, 450), 50, 80, 0, 1, .5, "DOOR");
@@ -454,13 +457,27 @@ setTimeout(function () {
   generateEnemy(3000);
 }, 1000);
 
-
+var positionY = 50;
 function generateEnemy(timerEnemy) {
   setTimeout(function () {
+
+    console.log(positionY);
     rand = getRandomArbitrary(180, 830);
-    obs = Rectangle(Vec2(rand, 150), 10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
+    obs = Rectangle(Vec2(rand, positionY), 10, Math.random() * 20 + 10, Math.random() * 30, Math.random() / 2, Math.random() / 2, "ENEMY");
     if (timerEnemy > 500) {
+
       timerEnemy = timerEnemy - 500;
+    } else {
+      if (positionYRoof < 60) {
+        console.log(positionYRoof);
+        positionY += 5;
+        positionYRoof += 1;
+        r1.V.y = 10;
+      }else{
+        r1.V.y = 0;
+      }
+
+      
     }
 
     console.log(obs.Name);
@@ -554,6 +571,14 @@ function looser() {
   window.location.reload();
 }
 
+function testHole(objectShape) {
+  if (objectShape.V.y > 1000) {
+    gameplay = false;
+    looser();
+    return true;
+  }
+}
+
 // Loop
 setInterval(
 
@@ -569,6 +594,17 @@ setInterval(
 
             // Test bounds
             if (boundTest(objects[i], objects[j])) {
+
+              if (objects[i].Name == "PLAYER") {
+                if (testHole(objects[i])) {
+                  return;
+                }
+              } else if (objects[j].Name == "PLAYER") {
+                if (testHole(objects[j])) {
+                  return;
+                }
+
+              }
 
               // Test collision
               if (testCollision(objects[i], objects[j], collisionInfo)) {
